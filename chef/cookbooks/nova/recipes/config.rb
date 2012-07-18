@@ -20,9 +20,11 @@
 
 node[:nova][:my_ip] = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
 
-package "nova-common" do
-  options "--force-yes -o Dpkg::Options::=\"--force-confdef\""
-  action :upgrade
+unless node[:nova][:use_gitrepo]
+  package "nova-common" do
+    options "--force-yes -o Dpkg::Options::=\"--force-confdef\""
+    action :upgrade
+  end
 end
 
 package "python-mysqldb"

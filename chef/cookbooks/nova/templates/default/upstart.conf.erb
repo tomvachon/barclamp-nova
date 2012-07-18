@@ -1,0 +1,21 @@
+description "<%= @service_name %> server"
+author "nova-barclamp <root@crowbar>"
+
+start on (filesystem and net-device-up IFACE!=lo)
+stop on runlevel [016]
+
+
+chdir /var/run
+
+pre-start script
+    mkdir -p /var/run/nova
+    chown nova:root /var/run/nova/
+
+    mkdir -p /var/lock/nova
+    chown nova:root /var/lock/nova/
+    <%= "modprobe nbd" if @service_name == "nova-compute" %>
+end script
+
+<% params = "--flagfile=/etc/nova/nova.conf" -%>
+<% params += " --flagfile=/etc/nova/nova-compute.conf" if @service_name == "nova-compute" -%>
+exec su -s /bin/sh -c "exec <%= "#{@nova_path}/bin/#{@service_name} #{params}" %>" nova

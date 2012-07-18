@@ -14,10 +14,36 @@
 #
 define :nova_package do
 
+  package("git")
+  nova_path = "/opt/nova"
   nova_name="nova-#{params[:name]}"
-  package nova_name do
-    options "--force-yes -o Dpkg::Options::=\"--force-confdef\""
-    action :upgrade
+  if node[:nova][:use_gitrepo]
+    git "#{nova_path}" do
+      repository node[:nova][:gitrepo]
+      reference "stable/essex"
+      action :checkout
+    end
+    execute "setup_nova" do
+      command "cd #{nova_path} && python setup.py develop"
+      creates "#{nova_path}/nova.egg-info"
+    end
+    template "/etc/init/#{nova_name}.conf" do
+      source "upstart.conf.erb"
+      mode 0644
+      variables({
+        :service_name => nova_name,
+        :nova_path => nova_path
+      })
+    end
+    execute "link_service_#{nova_name}" do
+      command "ln -s /lib/init/upstart-job /etc/init.d/#{nova_name}"
+      creates "/etc/init.d/#{nova_name}"
+    end
+  else
+    package nova_name do
+      options "--force-yes -o Dpkg::Options::=\"--force-confdef\""
+      action :upgrade
+    end
   end
 
   service nova_name do

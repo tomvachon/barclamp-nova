@@ -19,6 +19,8 @@
             "libvirt_type": { "type": "str", "required": true },
             "use_novnc": { "type": "bool", "required": true },
             "verbose": { "type": "bool", "required": true },
+            "gitrepo": { "type": "str", "required": true },
+            "use_gitrepo": { "type": "bool", "required": true },
             "user": { "type": "str", "required": true },
             "network": {
               "type": "map",

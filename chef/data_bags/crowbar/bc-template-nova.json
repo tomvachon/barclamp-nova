@@ -10,6 +10,8 @@
       "use_novnc": true,
       "verbose": true,
       "user": "nova",
+      "gitrepo": "git://github.com/openstack/nova.git",
+      "use_gitrepo": false,
       "network": {
         "ha_enabled": true,
         "tenant_vlans": false,
